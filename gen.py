@@ -31,22 +31,26 @@
 import cairo
 
 
-_base_resolutions = {'iPhone': (480, 320), 'iPhone Retina 3.5"': (960, 640), 'iPad': (1024, 768), 
-	'iPad Retina': (2048, 1536), 'iPhone Retina 4"': (1136, 640), 'Nexus One': (800, 480),
-	'Nexus S': (800, 480), 'Galaxy Nexus': (1280, 720), 'Nexus 4': (1280, 768),
-	'Nexus 7': (1280, 800), 'Nexus 10': (2560, 1600)}
+# _base_resolutions = {'iPhone': (480, 320), 'iPhone Retina 3.5"': (960, 640), 'iPad': (1024, 768), 
+# 	'iPad Retina': (2048, 1536), 'iPhone Retina 4"': (1136, 640), 'Nexus One': (800, 480),
+# 	'Nexus S': (800, 480), 'Galaxy Nexus': (1280, 720), 'Nexus 4': (1280, 768),
+# 	'Nexus 7': (1280, 800), 'Nexus 10': (2560, 1600)}
 
 
-screen_resolutions = {}
-for name, resolution in _base_resolutions.items():
-	oriented_name = name + ' Landscape'
-	screen_resolutions[oriented_name] = resolution
+# screen_resolutions = {}
+# for name, resolution in _base_resolutions.items():
+# 	oriented_name = name + ' Landscape'
+# 	screen_resolutions[oriented_name] = resolution
 
-	oriented_name = name + ' Portrait'
-	screen_resolutions[oriented_name] = (resolution[1], resolution[0])
+# 	oriented_name = name + ' Portrait'
+# 	screen_resolutions[oriented_name] = (resolution[1], resolution[0])
 
 
-def gen_filled_square_rgb888(side_pixels, rgb_color = (1,1,1)):
+rgb_colors = {'black': (0,0,0), 'red': (1,0,0), 'green': (0,1,0), 'blue': (0,0,1),
+	'yellow': (1,1,0), 'cyan': (0,1,1), 'magenta': (1,0,1), 'white': (1,1,1)}
+
+
+def create_filled_square_rgb888(side_pixels, rgb_color = (1,1,1)):
 	'''Returns a Cairo surface entirely filled with a square of the desired pixel dimensions, in the
 	desired color. The side length is given in pixels as side_pixels. The fill color is given as 
 	a 3-tuple of red, green, and blue components (each in the range 0.0 to 1.0) in rgb_color. The 
@@ -61,9 +65,41 @@ def gen_filled_square_rgb888(side_pixels, rgb_color = (1,1,1)):
 	return surface
 
 
-if __name__ == '__main__':
-	width_pixels = 64
-	height_pixels = 64
+def create_filled_square_with_border_rgb888(side_pixels, border_pixels, rgb_fill = (1,1,1), rgb_border = (0,0,0)):
+	surface = cairo.ImageSurface(cairo.FORMAT_RGB24, side_pixels, side_pixels)
+	ctx = cairo.Context(surface)
 
-	surface = gen_filled_square_rgb888(64)
-	surface.write_to_png('square_white_%04d.png' % (width_pixels,))
+	apply(ctx.set_source_rgb, rgb_fill)
+	ctx.rectangle(0, 0, side_pixels, side_pixels)
+	ctx.fill()
+
+	apply(ctx.set_source_rgb, rgb_border)
+
+	ctx.set_line_width(border_pixels)
+	inset = 0.5 * border_pixels
+	ctx.rectangle(inset, inset, side_pixels - 2 * inset, side_pixels - 2 * inset)
+	ctx.stroke()
+
+	return surface
+
+
+if __name__ == '__main__':
+	square_sizes = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024]
+	for sz in square_sizes:
+		surface = create_filled_square_rgb888(sz, (1,1,1))
+		surface.write_to_png('square_%s_%04d.png' % ('white', sz))
+
+		surface = create_filled_square_rgb888(sz, (0,0,0))
+		surface.write_to_png('square_%s_%04d.png' % ('black', sz))
+
+
+		border_widths = [1, 2, 4, 8, 16, 32]
+		for bw in border_widths:
+			if bw >= sz / 2:	# Skip if border is too thick for small image
+				continue
+
+			surface = create_filled_square_with_border_rgb888(sz, bw)
+			surface.write_to_png('square_%s_%04d_border_%s_%02d.png' % ('white', sz, 'black', bw))
+
+			surface = create_filled_square_with_border_rgb888(sz, bw, (0,0,0), (1,1,1))
+			surface.write_to_png('square_%s_%04d_border_%s_%02d.png' % ('black', sz, 'white', bw))
