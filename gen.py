@@ -46,15 +46,24 @@ for name, resolution in _base_resolutions.items():
 	screen_resolutions[oriented_name] = (resolution[1], resolution[0])
 
 
+def gen_filled_square_rgb888(side_pixels, rgb_color = (1,1,1)):
+	'''Returns a Cairo surface entirely filled with a square of the desired pixel dimensions, in the
+	desired color. The side length is given in pixels as side_pixels. The fill color is given as 
+	a 3-tuple of red, green, and blue components (each in the range 0.0 to 1.0) in rgb_color. The 
+	returned surface is in 24-bit RGB (FORMAT_RGB24) format, with 8 bits per color channel.'''
+
+	surface = cairo.ImageSurface(cairo.FORMAT_RGB24, side_pixels, side_pixels)
+	ctx = cairo.Context(surface)
+
+	apply(ctx.set_source_rgb, rgb_color)
+	ctx.rectangle(0, 0, side_pixels, side_pixels)
+	ctx.fill()
+	return surface
+
+
 if __name__ == '__main__':
 	width_pixels = 64
 	height_pixels = 64
 
-	surface = cairo.ImageSurface(cairo.FORMAT_RGB24, width_pixels, height_pixels)
-	ctx = cairo.Context(surface)
-
-	ctx.set_source_rgb(1, 1, 1)
-	ctx.rectangle(0, 0, width_pixels, height_pixels)
-	ctx.fill()
-
+	surface = gen_filled_square_rgb888(64)
 	surface.write_to_png('square_white_%04d.png' % (width_pixels,))
