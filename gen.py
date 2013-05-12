@@ -29,6 +29,7 @@
 
 
 import cairo
+import math
 
 
 # _base_resolutions = {'iPhone': (480, 320), 'iPhone Retina 3.5"': (960, 640), 'iPad': (1024, 768), 
@@ -83,6 +84,22 @@ def create_filled_square_with_border_rgb888(side_pixels, border_pixels, rgb_fill
 	return surface
 
 
+def create_filled_circle_with_border_argb8888(radius_pixels, border_pixels, rgb_fill = (1,1,1), rgb_border = (0,0,0)):
+	surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, int(2 * radius_pixels), int(2 * radius_pixels))
+	ctx = cairo.Context(surface)
+
+	apply(ctx.set_source_rgb, rgb_fill)
+	ctx.arc(radius_pixels, radius_pixels, radius_pixels - 0.5 * border_pixels, 0, 2 * math.pi)
+	ctx.fill()
+
+	apply(ctx.set_source_rgb, rgb_border)
+	ctx.set_line_width(border_pixels)
+	ctx.arc(radius_pixels, radius_pixels, radius_pixels - 0.5 * border_pixels, 0, 2 * math.pi)
+	ctx.stroke()
+
+	return surface
+
+
 if __name__ == '__main__':
 	square_sizes = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024]
 	for sz in square_sizes:
@@ -93,7 +110,7 @@ if __name__ == '__main__':
 		surface.write_to_png('square_%s_%04d.png' % ('black', sz))
 
 
-		border_widths = [1, 2, 4, 8, 16, 32]
+		border_widths = [1, 2, 4, 8, 16, 32, 64]
 		for bw in border_widths:
 			if bw >= sz / 2:	# Skip if border is too thick for small image
 				continue
@@ -103,3 +120,10 @@ if __name__ == '__main__':
 
 			surface = create_filled_square_with_border_rgb888(sz, bw, (0,0,0), (1,1,1))
 			surface.write_to_png('square_%s_%04d_border_%s_%02d.png' % ('black', sz, 'white', bw))
+
+			surface = create_filled_circle_with_border_argb8888(0.5 * sz, bw)
+			surface.write_to_png('circle_%s_%04d_border_%s_%02d.png' % ('white', sz, 'black', bw))
+
+			surface = create_filled_circle_with_border_argb8888(0.5 * sz, bw, (0,0,0), (1,1,1))
+			surface.write_to_png('circle_%s_%04d_border_%s_%02d.png' % ('black', sz, 'white', bw))
+
