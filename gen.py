@@ -31,6 +31,18 @@
 import cairo
 import math
 
+# TODO
+#
+# * Placeholder screen-shots in standard sizes
+# * Placeholder app icons and iTunes Connect art
+# * Simple geometric shapes and stars
+# * circles with heading indicator (radial line)
+# * boxes with arrows (compass directions)
+# * capsules
+# * rounded rects, dashed, buttons with highlight
+# * sprite animations of simple 3d objects spinning
+# * animated button gleam/bling
+# * scale 9s
 
 # _base_resolutions = {'iPhone': (480, 320), 'iPhone Retina 3.5"': (960, 640), 'iPad': (1024, 768), 
 # 	'iPad Retina': (2048, 1536), 'iPhone Retina 4"': (1136, 640), 'Nexus One': (800, 480),
