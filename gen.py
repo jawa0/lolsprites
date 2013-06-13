@@ -136,10 +136,10 @@ if __name__ == '__main__':
 	square_sizes = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024]
 	for sz in square_sizes:
 		surface = create_filled_square_rgb888(sz, (1,1,1))
-		surface.write_to_png('square_%s_%04d.png' % ('white', sz))
+		surface.write_to_png('images/square_%s_%04d.png' % ('white', sz))
 
 		surface = create_filled_square_rgb888(sz, (0,0,0))
-		surface.write_to_png('square_%s_%04d.png' % ('black', sz))
+		surface.write_to_png('images/square_%s_%04d.png' % ('black', sz))
 
 
 		border_widths = [1, 2, 4, 8, 16, 32, 64]
@@ -148,16 +148,16 @@ if __name__ == '__main__':
 				continue
 
 			surface = create_filled_square_with_border_rgb888(sz, bw)
-			surface.write_to_png('square_%s_%04d_border_%s_%02d.png' % ('white', sz, 'black', bw))
+			surface.write_to_png('images/square_%s_%04d_border_%s_%02d.png' % ('white', sz, 'black', bw))
 
 			surface = create_filled_square_with_border_rgb888(sz, bw, (0,0,0), (1,1,1))
-			surface.write_to_png('square_%s_%04d_border_%s_%02d.png' % ('black', sz, 'white', bw))
+			surface.write_to_png('images/square_%s_%04d_border_%s_%02d.png' % ('black', sz, 'white', bw))
 
 			surface = create_filled_circle_with_border_argb8888(0.5 * sz, bw)
-			surface.write_to_png('circle_%s_%04d_border_%s_%02d.png' % ('white', sz, 'black', bw))
+			surface.write_to_png('images/circle_%s_%04d_border_%s_%02d.png' % ('white', sz, 'black', bw))
 
 			surface = create_filled_circle_with_border_argb8888(0.5 * sz, bw, (0,0,0), (1,1,1))
-			surface.write_to_png('circle_%s_%04d_border_%s_%02d.png' % ('black', sz, 'white', bw))
+			surface.write_to_png('images/circle_%s_%04d_border_%s_%02d.png' % ('black', sz, 'white', bw))
 
 			surface = create_filled_border_circle_with_radius(0.5 * sz, bw, (0,0,0), (1,1,1))
 			surface.write_to_png('circle_rad_%s_%04d_border_%s_%02d.png' % ('black', sz, 'white', bw))
