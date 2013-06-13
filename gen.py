@@ -112,6 +112,26 @@ def create_filled_circle_with_border_argb8888(radius_pixels, border_pixels, rgb_
 	return surface
 
 
+def create_filled_border_circle_with_radius(radius_pixels, border_pixels, rgb_fill = (1,1,1), rgb_border = (0,0,0)):
+	surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, int(2 * radius_pixels), int(2 * radius_pixels))
+	ctx = cairo.Context(surface)
+
+	apply(ctx.set_source_rgb, rgb_fill)
+	ctx.arc(radius_pixels, radius_pixels, radius_pixels - 0.5 * border_pixels, 0, 2 * math.pi)
+	ctx.fill()
+
+	apply(ctx.set_source_rgb, rgb_border)
+	ctx.set_line_width(border_pixels)
+	ctx.arc(radius_pixels, radius_pixels, radius_pixels - 0.5 * border_pixels, 0, 2 * math.pi)
+	ctx.stroke()
+
+	ctx.move_to(radius_pixels, radius_pixels)
+	ctx.line_to(2 * radius_pixels - 0.5 * border_pixels, radius_pixels)
+	ctx.stroke()
+
+	return surface
+
+
 if __name__ == '__main__':
 	square_sizes = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024]
 	for sz in square_sizes:
@@ -138,4 +158,11 @@ if __name__ == '__main__':
 
 			surface = create_filled_circle_with_border_argb8888(0.5 * sz, bw, (0,0,0), (1,1,1))
 			surface.write_to_png('circle_%s_%04d_border_%s_%02d.png' % ('black', sz, 'white', bw))
+
+			surface = create_filled_border_circle_with_radius(0.5 * sz, bw, (0,0,0), (1,1,1))
+			surface.write_to_png('circle_rad_%s_%04d_border_%s_%02d.png' % ('black', sz, 'white', bw))
+
+			surface = create_filled_border_circle_with_radius(0.5 * sz, bw)
+			surface.write_to_png('circle_rad_%s_%04d_border_%s_%02d.png' % ('white', sz, 'black', bw))
+
 
