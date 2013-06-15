@@ -132,8 +132,48 @@ def create_filled_border_circle_with_radius(radius_pixels, border_pixels, rgb_fi
 	return surface
 
 
+def rounded_rect(side_pixels, border_pixels, bevel_radius_percentage = 0.2, rgb_fill = (1,1,1), rgb_border = (0,0,0)):
+	# TODO: cleanup copypasta
+
+	surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, side_pixels, side_pixels)
+	ctx = cairo.Context(surface)
+
+	bevel_pixels = side_pixels * bevel_radius_percentage
+
+	apply(ctx.set_source_rgb, rgb_fill)
+
+	ctx.arc(side_pixels - bevel_pixels, bevel_pixels, bevel_pixels - 0.5 * border_pixels, 1.5 * math.pi, 0)
+	ctx.arc(side_pixels - bevel_pixels, side_pixels - bevel_pixels, bevel_pixels - 0.5 * border_pixels, 0, 0.5 * math.pi)
+	ctx.arc(bevel_pixels, side_pixels - bevel_pixels, bevel_pixels - 0.5 * border_pixels, 0.5 * math.pi, math.pi)
+	ctx.arc(bevel_pixels, bevel_pixels, bevel_pixels - 0.5 * border_pixels, math.pi, 1.5 * math.pi)
+	ctx.line_to(side_pixels - bevel_pixels, 0.5 * border_pixels)
+	ctx.fill()
+
+
+	# apply(ctx.set_source_rgb, rgb_fill)
+	# ctx.arc(radius_pixels, radius_pixels, radius_pixels - 0.5 * border_pixels, 0, 2 * math.pi)
+	# ctx.fill()
+
+	apply(ctx.set_source_rgb, rgb_border)
+
+	ctx.set_line_width(border_pixels)
+
+	ctx.arc(side_pixels - bevel_pixels, bevel_pixels, bevel_pixels - 0.5 * border_pixels, 1.5 * math.pi, 0)
+	ctx.arc(side_pixels - bevel_pixels, side_pixels - bevel_pixels, bevel_pixels - 0.5 * border_pixels, 0, 0.5 * math.pi)
+	ctx.arc(bevel_pixels, side_pixels - bevel_pixels, bevel_pixels - 0.5 * border_pixels, 0.5 * math.pi, math.pi)
+	ctx.arc(bevel_pixels, bevel_pixels, bevel_pixels - 0.5 * border_pixels, math.pi, 1.5 * math.pi)
+	ctx.line_to(side_pixels - bevel_pixels, 0.5 * border_pixels)
+
+	ctx.stroke()
+	return surface
+
+
+
 if __name__ == '__main__':
 	square_sizes = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024]
+	border_widths = [1, 2, 4, 8, 16, 32, 64]
+	bevel_percentages = [0.1, 0.15, 0.2, 0.25, 0.4]
+
 	for sz in square_sizes:
 		surface = create_filled_square_rgb888(sz, (1,1,1))
 		surface.write_to_png('images/square_%s_%04d.png' % ('white', sz))
@@ -141,8 +181,6 @@ if __name__ == '__main__':
 		surface = create_filled_square_rgb888(sz, (0,0,0))
 		surface.write_to_png('images/square_%s_%04d.png' % ('black', sz))
 
-
-		border_widths = [1, 2, 4, 8, 16, 32, 64]
 		for bw in border_widths:
 			if bw >= sz / 2:	# Skip if border is too thick for small image
 				continue
@@ -160,9 +198,21 @@ if __name__ == '__main__':
 			surface.write_to_png('images/circle_%s_%04d_border_%s_%02d.png' % ('black', sz, 'white', bw))
 
 			surface = create_filled_border_circle_with_radius(0.5 * sz, bw, (0,0,0), (1,1,1))
-			surface.write_to_png('circle_rad_%s_%04d_border_%s_%02d.png' % ('black', sz, 'white', bw))
+			surface.write_to_png('images/circle_rad_%s_%04d_border_%s_%02d.png' % ('black', sz, 'white', bw))
 
 			surface = create_filled_border_circle_with_radius(0.5 * sz, bw)
-			surface.write_to_png('circle_rad_%s_%04d_border_%s_%02d.png' % ('white', sz, 'black', bw))
+			surface.write_to_png('images/circle_rad_%s_%04d_border_%s_%02d.png' % ('white', sz, 'black', bw))
 
+			for bevel in bevel_percentages:
+				bevel_pix = bevel * sz
+				if bevel_pix < 3:	# Don't draw really tiny bevels
+					continue
 
+				if bevel_pix < 2 * bw:	# Or we won't see a curve
+					continue
+
+				surface = rounded_rect(sz, bw, bevel, (1,1,1), (0,0,0))
+				surface.write_to_png('images/square_%s_%04d_border_%s_%02d_bevel_%04d.png' % ('white', sz, 'black', bw, bevel_pix))
+
+				surface = rounded_rect(sz, bw, bevel, (0,0,0), (1,1,1))
+				surface.write_to_png('images/square_%s_%04d_border_%s_%02d_bevel_%04d.png' % ('black', sz, 'white', bw, bevel_pix))
