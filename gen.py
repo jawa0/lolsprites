@@ -168,6 +168,9 @@ def rounded_rect(side_pixels, border_pixels, bevel_radius_percentage = 0.2, rgb_
 	return surface
 
 
+def filename_from_options(kind, size, border, fill_color, border_color, bevel = None):
+	return ''
+
 
 if __name__ == '__main__':
 	square_sizes = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024]
